@@ -59,3 +59,83 @@ This script relies on the following Python packages:
 - Data received from the WebSocket server is expected to be in a specific format. Ensure that the data format matches the schema used in the script.
 
 - Be cautious when modifying the script to handle different data formats or databases, as it may require adjustments to the code.
+
+# Custom Logger
+
+The `CustomLogger` class is a Python utility for logging messages to a timed rotating log file using the `logging` module. It provides an easy way to configure and manage log files for your applications. Below is an explanation of the key features and how to use this class.
+
+## Features
+
+- **Timed Rotating Log Files**: The `CustomLogger` creates log files that rotate at specific intervals (e.g., daily) to ensure that log files do not grow indefinitely.
+
+- **Customizable Logging Levels**: You can log messages with different severity levels, including DEBUG, INFO, WARNING, ERROR, and CRITICAL.
+
+- **Clear Log on Start**: Optionally, you can clear the log file each time your application starts, or you can append new log entries to an existing log file.
+
+## Usage
+
+1. Import the `CustomLogger` class:
+
+   ```python
+   from custom_logger import CustomLogger
+   ```
+
+2. Create an instance of the `CustomLogger` class:
+
+   ```python
+   logger = CustomLogger(name='MyLogger', clear_log=True, level=logging.DEBUG)
+   ```
+
+   - `name`: The name of the logger (default is `None`).
+   - `clear_log`: Set to `True` to clear the log file when starting the application, or `False` to append new log entries to the existing log file.
+   - `level`: The logging level for the logger (default is `logging.NOTSET`).
+
+3. Use the logger to log messages with different severity levels:
+
+   - `logger.debug(message)`: Log a message with DEBUG level.
+   - `logger.info(message)`: Log a message with INFO level.
+   - `logger.warning(message)`: Log a message with WARNING level.
+   - `logger.error(message)`: Log a message with ERROR level.
+   - `logger.critical(message)`: Log a message with CRITICAL level.
+
+   Example:
+
+   ```python
+   logger.debug("This is a debug message")
+   logger.error("An error occurred")
+   ```
+
+4. Close the logger when you're done:
+
+   ```python
+   logger.close("Closing logger.")
+   ```
+
+   This is important for ensuring that all log entries are flushed to the log file and for proper cleanup.
+
+## Log File Configuration
+
+- The log file path is set to `'./debug/debug.txt'` by default. You can modify it by changing the `file_path` attribute in the `CustomLogger` class.
+
+- The log files are rotated daily (`when='midnight'`) by default, and up to 5 backup log files are retained. You can customize these settings by modifying the `TimedRotatingFileHandler` configuration in the class.
+
+- The log entries include a timestamp, logger name, log level, module name, function name, and the log message.
+
+## Example
+
+Here's an example of how to use the `CustomLogger` class:
+
+```python
+from custom_logger import CustomLogger
+import logging
+
+logger = CustomLogger(name='MyLogger', clear_log=True, level=logging.DEBUG)
+
+logger.debug("This is a debug message")
+logger.info("This is an info message")
+logger.error("An error occurred")
+
+logger.close("Closing logger.")
+```
+
+In this example, a `CustomLogger` instance is created, and messages with different log levels are logged. The log entries are stored in a timed rotating log file with the specified configuration.
