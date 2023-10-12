@@ -139,3 +139,151 @@ logger.close("Closing logger.")
 ```
 
 In this example, a `CustomLogger` instance is created, and messages with different log levels are logged. The log entries are stored in a timed rotating log file with the specified configuration.
+
+# ProcessLock
+
+The `ProcessLock` class is a Python utility for implementing a file-based process lock with retries and logging. It is designed to ensure that only one instance of a particular process is running at a time. This can be useful in situations where concurrent execution of the same script or application is undesirable. Below is an explanation of the key features and how to use this class.
+
+## Features
+
+- **File-Based Lock**: The `ProcessLock` uses a file as a lock to prevent multiple instances of a process from running simultaneously.
+
+- **Retries**: If the lock cannot be acquired immediately, the class retries a specified number of times with a configurable delay between each attempt.
+
+- **Logging**: The class logs events and errors to provide information about the lock acquisition process.
+
+## Usage
+
+1. Import the `ProcessLock` class:
+
+   ```python
+   from process_lock import ProcessLock
+   ```
+
+2. Create an instance of the `ProcessLock` class with a lock file name and a logger object:
+
+   ```python
+   logger = logging.getLogger(__name__)  # Replace with your own logger configuration
+   process_lock = ProcessLock("my_process.lock", logger)
+   ```
+
+   - `lockfile_name`: The name of the lock file. This should be unique to the process you want to lock.
+
+3. Use the `ProcessLock` as a context manager within a `with` block to acquire the lock:
+
+   ```python
+   with process_lock:
+       # Your code here
+   ```
+
+   The lock will be acquired, and the code within the `with` block will execute. If the lock cannot be acquired, the script will log an error and exit gracefully.
+
+4. The lock is automatically released when the `with` block exits, whether due to successful execution or an exception.
+
+## Configuration
+
+- `MAX_RETRIES`: The maximum number of times the lock acquisition is retried. This is set to 5 by default but can be customized to your requirements.
+
+- `RETRY_DELAY`: The delay (in seconds) between each retry attempt. The default is 0.5 seconds.
+
+- The lock file is created in the system's temporary directory (retrieved using `tempfile.gettempdir()`) with the specified lock file name.
+
+- The class logs the lock acquisition process and any unexpected errors that occur during the lock release.
+
+## Example
+
+Here's an example of how to use the `ProcessLock` class:
+
+```python
+import os, sys, errno, time, tempfile, logging
+
+MAX_RETRIES = 5
+RETRY_DELAY = 0.5  # seconds
+
+logger = logging.getLogger(__name__)
+
+process_lock = ProcessLock("my_process.lock", logger)
+
+with process_lock:
+    # Your code that should run exclusively
+    print("Lock acquired, running the process...")
+
+# The lock is automatically released when the 'with' block exits.
+print("Process completed.")
+```
+
+In this example, a `ProcessLock` instance is created with a lock file name, and it is used as a context manager within a `with` block. If the lock cannot be acquired due to another running process, the script will exit gracefully. If the lock is acquired, the code within the `with` block will execute, ensuring exclusive access to the process.
+
+# FlagManager
+
+The `FlagManager` class is a simple Python utility designed to encapsulate a boolean flag value stored in a mutable list. It provides a straightforward and reusable way to manage boolean flags in your code. This class is particularly useful when you need to share a flag's state among different parts of your program or ensure safe thread access to a shared flag.
+
+## Features
+
+- **Encapsulation**: The class encapsulates a boolean flag within a mutable list, allowing you to modify the flag's value using methods.
+
+- **Set and Clear**: You can easily set or clear the flag's value using dedicated methods.
+
+- **Querying State**: Check whether the flag is set or cleared using the `is_set` and `is_cleared` methods.
+
+- **Safe Mutable State**: The mutable list helps ensure safe access to the flag in multi-threaded or shared memory environments.
+
+- **Destructor**: The class defines a destructor method, `__del__`, which is not used but can be extended for specific cleanup tasks if needed.
+
+## Usage
+
+1. Import the `FlagManager` class:
+
+   ```python
+   from flag_manager import FlagManager
+   ```
+
+2. Create an instance of the `FlagManager` class:
+
+   ```python
+   flag = FlagManager()
+   ```
+
+3. Use the following methods to manage the flag:
+
+   - `set_flag()`: Set the flag to `True`.
+   - `clear_flag()`: Clear the flag (set it to `False`).
+   - `is_set()`: Check if the flag is set (returns `True` if set, otherwise `False`).
+   - `is_cleared()`: Check if the flag is cleared (returns `True` if cleared, otherwise `False`).
+
+   Example:
+
+   ```python
+   flag = FlagManager()
+   flag.set_flag()
+   if flag.is_set():
+       print("Flag is set.")
+   flag.clear_flag()
+   if flag.is_cleared():
+       print("Flag is cleared.")
+   ```
+
+4. The flag's value is stored within the `FlagManager` instance, and you can safely use it in your code to control program flow, synchronization, or other logic.
+
+## Example
+
+Here's an example of how to use the `FlagManager` class:
+
+```python
+from flag_manager import FlagManager
+
+# Create a flag instance
+flag = FlagManager()
+
+# Set the flag
+flag.set_flag()
+if flag.is_set():
+    print("Flag is set.")
+
+# Clear the flag
+flag.clear_flag()
+if flag.is_cleared():
+    print("Flag is cleared.")
+```
+
+In this example, a `FlagManager` instance is created, and the flag is set and cleared using the provided methods. You can use this class to manage flags in a clean and organized way within your code.
